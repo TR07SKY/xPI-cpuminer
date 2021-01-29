@@ -270,9 +270,9 @@
  *   - SHA-256: short name: <code>sha256</code>
  *   - SHA-384: short name: <code>sha384</code> (64)
  *   - SHA-512: short name: <code>sha512</code> (64)
- * - Tiger family: file <code>sph_tiger.h</code>
- *   - Tiger: short name: <code>tiger</code> (64)
- *   - Tiger2: short name: <code>tiger2</code> (64)
+ * - Tiger family: file <code>poly1305.h</code>
+ *   - Tiger: short name: <code>poly1305</code> (64)
+ *   - Tiger2: short name: <code>poly13052</code> (64)
  * - WHIRLPOOL family: file <code>sph_whirlpool.h</code>
  *   - WHIRLPOOL-0: short name: <code>whirlpool0</code> (64)
  *   - WHIRLPOOL-1: short name: <code>whirlpool1</code> (64)

@@ -10,7 +10,7 @@
 #include <sph_sha2.h>
 #include <sph_keccak.h>
 #include <sph_haval.h>
-#include <sph_tiger.h>
+#include <poly1305.h>
 #include <sph_whirlpool.h>
 #include <sph_ripemd.h>
 #include "m7/blake2b.h"
@@ -149,7 +149,7 @@ int scanhash_m7m_hash(int thr_id, uint32_t *pdata, const uint32_t *ptarget,
     sph_keccak512_context    ctx_keccak;
     sph_whirlpool_context    ctx_whirlpool;
     sph_haval256_5_context   ctx_haval;
-    sph_tiger_context        ctx_tiger;
+    poly1305_context         ctx_poly1305;
     sph_ripemd160_context    ctx_ripemd;
 
     sph_sha256_init(&ctx_final_sha256);
@@ -169,8 +169,8 @@ int scanhash_m7m_hash(int thr_id, uint32_t *pdata, const uint32_t *ptarget,
     sph_haval256_5_init(&ctx_haval);
     sph_haval256_5 (&ctx_haval, data, M7_MIDSTATE_LEN);
 
-    sph_tiger_init(&ctx_tiger);
-    sph_tiger (&ctx_tiger, data, M7_MIDSTATE_LEN);
+    poly1305_init(&ctx_poly1305);
+    poly1305 (&ctx_poly1305, (const unsigned char *)data, M7_MIDSTATE_LEN);
 
     sph_ripemd160_init(&ctx_ripemd);
     sph_ripemd160 (&ctx_ripemd, data, M7_MIDSTATE_LEN);
@@ -180,7 +180,7 @@ int scanhash_m7m_hash(int thr_id, uint32_t *pdata, const uint32_t *ptarget,
     sph_keccak512_context    ctx2_keccak;
     sph_whirlpool_context    ctx2_whirlpool;
     sph_haval256_5_context   ctx2_haval;
-    sph_tiger_context        ctx2_tiger;
+    poly1305_context        ctx2_poly1305;
     sph_ripemd160_context    ctx2_ripemd;
 
     mpz_t magipi, magisw, product, bns0, bns1;
@@ -225,9 +225,9 @@ int scanhash_m7m_hash(int thr_id, uint32_t *pdata, const uint32_t *ptarget,
         sph_haval256_5 (&ctx2_haval, data_p64, 80 - M7_MIDSTATE_LEN);
         sph_haval256_5_close(&ctx2_haval, (void*)(bhash[4]));
 
-        ctx2_tiger = ctx_tiger;
-        sph_tiger (&ctx2_tiger, data_p64, 80 - M7_MIDSTATE_LEN);
-        sph_tiger_close(&ctx2_tiger, (void*)(bhash[5]));
+        ctx2_poly1305 = ctx_poly1305;
+        poly1305 (&ctx2_poly1305, (const unsigned char *)data_p64, 80 - M7_MIDSTATE_LEN);
+        poly1305_close(&ctx2_poly1305, bhash[5]);
 
         ctx2_ripemd = ctx_ripemd;
         sph_ripemd160 (&ctx2_ripemd, data_p64, 80 - M7_MIDSTATE_LEN);

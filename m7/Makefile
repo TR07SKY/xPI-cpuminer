@@ -111,7 +111,7 @@ libm7m_a_LIBADD =
 am_libm7m_a_OBJECTS = libm7m_a-haval.$(OBJEXT) \
 	libm7m_a-keccak.$(OBJEXT) libm7m_a-ripemd.$(OBJEXT) \
 	libm7m_a-sha2.$(OBJEXT) libm7m_a-sha2big.$(OBJEXT) \
-	libm7m_a-tiger.$(OBJEXT) libm7m_a-whirlpool.$(OBJEXT) \
+	libm7m_a-poly1305.$(OBJEXT) libm7m_a-whirlpool.$(OBJEXT) \
 	libm7m_a-blake2b.$(OBJEXT)
 libm7m_a_OBJECTS = $(am_libm7m_a_OBJECTS)
 AM_V_P = $(am__v_P_$(V))
@@ -131,8 +131,9 @@ depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__maybe_remake_depfiles = depfiles
 am__depfiles_remade = ./$(DEPDIR)/libm7m_a-blake2b.Po \
 	./$(DEPDIR)/libm7m_a-haval.Po ./$(DEPDIR)/libm7m_a-keccak.Po \
+	./$(DEPDIR)/libm7m_a-poly1305.Po \
 	./$(DEPDIR)/libm7m_a-ripemd.Po ./$(DEPDIR)/libm7m_a-sha2.Po \
-	./$(DEPDIR)/libm7m_a-sha2big.Po ./$(DEPDIR)/libm7m_a-tiger.Po \
+	./$(DEPDIR)/libm7m_a-sha2big.Po \
 	./$(DEPDIR)/libm7m_a-whirlpool.Po
 am__mv = mv -f
 AM_V_lt = $(am__v_lt_$(V))
@@ -179,13 +180,13 @@ ETAGS = etags
 CTAGS = ctags
 am__DIST_COMMON = $(srcdir)/Makefile.in $(top_srcdir)/depcomp
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
-ACLOCAL = ${SHELL} /home/pi/wolf-m7m-cpuminer-V2/missing aclocal-1.16
+ACLOCAL = ${SHELL} /home/pi/xPI-cpuminer/missing aclocal-1.16
 ALLOCA = 
 AMTAR = $${TAR-tar}
 AM_DEFAULT_VERBOSITY = 1
-AUTOCONF = ${SHELL} /home/pi/wolf-m7m-cpuminer-V2/missing autoconf
-AUTOHEADER = ${SHELL} /home/pi/wolf-m7m-cpuminer-V2/missing autoheader
-AUTOMAKE = ${SHELL} /home/pi/wolf-m7m-cpuminer-V2/missing automake-1.16
+AUTOCONF = ${SHELL} /home/pi/xPI-cpuminer/missing autoconf
+AUTOHEADER = ${SHELL} /home/pi/xPI-cpuminer/missing autoheader
+AUTOMAKE = ${SHELL} /home/pi/xPI-cpuminer/missing automake-1.16
 AWK = mawk
 CC = gcc
 CCAS = gcc
@@ -221,7 +222,7 @@ LIBS = -lgmp
 LTLIBOBJS = 
 M7M_LIBS = m7/libm7m.a
 MAINT = #
-MAKEINFO = ${SHELL} /home/pi/wolf-m7m-cpuminer-V2/missing makeinfo
+MAKEINFO = ${SHELL} /home/pi/xPI-cpuminer/missing makeinfo
 MKDIR_P = /usr/bin/mkdir -p
 OBJEXT = o
 PACKAGE = cpuminer
@@ -241,10 +242,10 @@ STRIP =
 VERSION = 2.4
 WS2_LIBS = 
 _libcurl_config = 
-abs_builddir = /home/pi/wolf-m7m-cpuminer-V2/m7
-abs_srcdir = /home/pi/wolf-m7m-cpuminer-V2/m7
-abs_top_builddir = /home/pi/wolf-m7m-cpuminer-V2
-abs_top_srcdir = /home/pi/wolf-m7m-cpuminer-V2
+abs_builddir = /home/pi/xPI-cpuminer/m7
+abs_srcdir = /home/pi/xPI-cpuminer/m7
+abs_top_builddir = /home/pi/xPI-cpuminer
+abs_top_srcdir = /home/pi/xPI-cpuminer
 ac_ct_CC = gcc
 ac_ct_CXX = g++
 am__include = include
@@ -272,7 +273,7 @@ host_vendor = unknown
 htmldir = ${docdir}
 includedir = ${prefix}/include
 infodir = ${datarootdir}/info
-install_sh = ${SHELL} /home/pi/wolf-m7m-cpuminer-V2/install-sh
+install_sh = ${SHELL} /home/pi/xPI-cpuminer/install-sh
 libdir = ${exec_prefix}/lib
 libexecdir = ${exec_prefix}/libexec
 localedir = ${datarootdir}/locale
@@ -301,8 +302,8 @@ noinst_LIBRARIES = libm7m.a
 libm7m_a_SOURCES = haval.c keccak.c \
 		ripemd.c sha2.c sha2big.c \
 		sph_haval.h sph_keccak.h sph_ripemd.h \
-		sph_sha2.h sph_tiger.h sph_whirlpool.h \
-		tiger.c whirlpool.c blake2b.c blake2b.h
+		sph_sha2.h poly1305.h sph_whirlpool.h \
+		poly1305.c whirlpool.c blake2b.c blake2b.h
 
 libm7m_a_CFLAGS = -Ofast -march=native -flto
 all: all-am
@@ -356,10 +357,10 @@ distclean-compile:
 include ./$(DEPDIR)/libm7m_a-blake2b.Po # am--include-marker
 include ./$(DEPDIR)/libm7m_a-haval.Po # am--include-marker
 include ./$(DEPDIR)/libm7m_a-keccak.Po # am--include-marker
+include ./$(DEPDIR)/libm7m_a-poly1305.Po # am--include-marker
 include ./$(DEPDIR)/libm7m_a-ripemd.Po # am--include-marker
 include ./$(DEPDIR)/libm7m_a-sha2.Po # am--include-marker
 include ./$(DEPDIR)/libm7m_a-sha2big.Po # am--include-marker
-include ./$(DEPDIR)/libm7m_a-tiger.Po # am--include-marker
 include ./$(DEPDIR)/libm7m_a-whirlpool.Po # am--include-marker
 
 $(am__depfiles_remade):
@@ -452,19 +453,19 @@ libm7m_a-sha2big.obj: sha2big.c
 #	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
 #	$(AM_V_CC_no)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libm7m_a_CFLAGS) $(CFLAGS) -c -o libm7m_a-sha2big.obj `if test -f 'sha2big.c'; then $(CYGPATH_W) 'sha2big.c'; else $(CYGPATH_W) '$(srcdir)/sha2big.c'; fi`
 
-libm7m_a-tiger.o: tiger.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libm7m_a_CFLAGS) $(CFLAGS) -MT libm7m_a-tiger.o -MD -MP -MF $(DEPDIR)/libm7m_a-tiger.Tpo -c -o libm7m_a-tiger.o `test -f 'tiger.c' || echo '$(srcdir)/'`tiger.c
-	$(AM_V_at)$(am__mv) $(DEPDIR)/libm7m_a-tiger.Tpo $(DEPDIR)/libm7m_a-tiger.Po
-#	$(AM_V_CC)source='tiger.c' object='libm7m_a-tiger.o' libtool=no \
+libm7m_a-poly1305.o: poly1305.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libm7m_a_CFLAGS) $(CFLAGS) -MT libm7m_a-poly1305.o -MD -MP -MF $(DEPDIR)/libm7m_a-poly1305.Tpo -c -o libm7m_a-poly1305.o `test -f 'poly1305.c' || echo '$(srcdir)/'`poly1305.c
+	$(AM_V_at)$(am__mv) $(DEPDIR)/libm7m_a-poly1305.Tpo $(DEPDIR)/libm7m_a-poly1305.Po
+#	$(AM_V_CC)source='poly1305.c' object='libm7m_a-poly1305.o' libtool=no \
 #	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
-#	$(AM_V_CC_no)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libm7m_a_CFLAGS) $(CFLAGS) -c -o libm7m_a-tiger.o `test -f 'tiger.c' || echo '$(srcdir)/'`tiger.c
+#	$(AM_V_CC_no)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libm7m_a_CFLAGS) $(CFLAGS) -c -o libm7m_a-poly1305.o `test -f 'poly1305.c' || echo '$(srcdir)/'`poly1305.c
 
-libm7m_a-tiger.obj: tiger.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libm7m_a_CFLAGS) $(CFLAGS) -MT libm7m_a-tiger.obj -MD -MP -MF $(DEPDIR)/libm7m_a-tiger.Tpo -c -o libm7m_a-tiger.obj `if test -f 'tiger.c'; then $(CYGPATH_W) 'tiger.c'; else $(CYGPATH_W) '$(srcdir)/tiger.c'; fi`
-	$(AM_V_at)$(am__mv) $(DEPDIR)/libm7m_a-tiger.Tpo $(DEPDIR)/libm7m_a-tiger.Po
-#	$(AM_V_CC)source='tiger.c' object='libm7m_a-tiger.obj' libtool=no \
+libm7m_a-poly1305.obj: poly1305.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libm7m_a_CFLAGS) $(CFLAGS) -MT libm7m_a-poly1305.obj -MD -MP -MF $(DEPDIR)/libm7m_a-poly1305.Tpo -c -o libm7m_a-poly1305.obj `if test -f 'poly1305.c'; then $(CYGPATH_W) 'poly1305.c'; else $(CYGPATH_W) '$(srcdir)/poly1305.c'; fi`
+	$(AM_V_at)$(am__mv) $(DEPDIR)/libm7m_a-poly1305.Tpo $(DEPDIR)/libm7m_a-poly1305.Po
+#	$(AM_V_CC)source='poly1305.c' object='libm7m_a-poly1305.obj' libtool=no \
 #	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
-#	$(AM_V_CC_no)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libm7m_a_CFLAGS) $(CFLAGS) -c -o libm7m_a-tiger.obj `if test -f 'tiger.c'; then $(CYGPATH_W) 'tiger.c'; else $(CYGPATH_W) '$(srcdir)/tiger.c'; fi`
+#	$(AM_V_CC_no)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libm7m_a_CFLAGS) $(CFLAGS) -c -o libm7m_a-poly1305.obj `if test -f 'poly1305.c'; then $(CYGPATH_W) 'poly1305.c'; else $(CYGPATH_W) '$(srcdir)/poly1305.c'; fi`
 
 libm7m_a-whirlpool.o: whirlpool.c
 	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libm7m_a_CFLAGS) $(CFLAGS) -MT libm7m_a-whirlpool.o -MD -MP -MF $(DEPDIR)/libm7m_a-whirlpool.Tpo -c -o libm7m_a-whirlpool.o `test -f 'whirlpool.c' || echo '$(srcdir)/'`whirlpool.c
@@ -621,10 +622,10 @@ distclean: distclean-am
 		-rm -f ./$(DEPDIR)/libm7m_a-blake2b.Po
 	-rm -f ./$(DEPDIR)/libm7m_a-haval.Po
 	-rm -f ./$(DEPDIR)/libm7m_a-keccak.Po
+	-rm -f ./$(DEPDIR)/libm7m_a-poly1305.Po
 	-rm -f ./$(DEPDIR)/libm7m_a-ripemd.Po
 	-rm -f ./$(DEPDIR)/libm7m_a-sha2.Po
 	-rm -f ./$(DEPDIR)/libm7m_a-sha2big.Po
-	-rm -f ./$(DEPDIR)/libm7m_a-tiger.Po
 	-rm -f ./$(DEPDIR)/libm7m_a-whirlpool.Po
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
@@ -674,10 +675,10 @@ maintainer-clean: maintainer-clean-am
 		-rm -f ./$(DEPDIR)/libm7m_a-blake2b.Po
 	-rm -f ./$(DEPDIR)/libm7m_a-haval.Po
 	-rm -f ./$(DEPDIR)/libm7m_a-keccak.Po
+	-rm -f ./$(DEPDIR)/libm7m_a-poly1305.Po
 	-rm -f ./$(DEPDIR)/libm7m_a-ripemd.Po
 	-rm -f ./$(DEPDIR)/libm7m_a-sha2.Po
 	-rm -f ./$(DEPDIR)/libm7m_a-sha2big.Po
-	-rm -f ./$(DEPDIR)/libm7m_a-tiger.Po
 	-rm -f ./$(DEPDIR)/libm7m_a-whirlpool.Po
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
