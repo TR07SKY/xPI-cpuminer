@@ -13,6 +13,7 @@
 #include <sph_tiger.h>
 #include <sph_whirlpool.h>
 #include <sph_ripemd.h>
+#include "m7/blake2b.h"
 
 #define EPSa DBL_EPSILON
 #define EPS1 DBL_EPSILON
@@ -52,7 +53,7 @@ inline double exp_n2(double x1, double x2)
 
 double swit2_(double wvnmb)
 {
-    return pow( (5.55243*(exp_n(-0.3*wvnmb/15.762) - exp_n(-0.6*wvnmb/15.762)))*wvnmb, 0.5) 
+    return pow( (5.55243*(exp_n(-0.3*wvnmb/15.762) - exp_n(-0.6*wvnmb/15.762)))*wvnmb, 0.5)
 	  / 1034.66 * pow(sin(wvnmb/65.), 2.);
 }
 
@@ -62,7 +63,7 @@ double GaussianQuad_N2(const double x1, const double x2)
     double s=0.0;
     double x[6], w[6];
     //gauleg(a2, b2, x, w);
-    
+
     int m,j;
     double z1, z, xm, xl, pp, p3, p2, p1;
     m=3;
@@ -77,36 +78,36 @@ double GaussianQuad_N2(const double x1, const double x2)
 			p1 = z;
 			p2 = 1;
 			p3 = 0;
-			
+
 			p3=1;
 			p2=z;
 			p1=((3.0 * z * z) - 1) / 2;
-			
+
 			p3=p2;
 			p2=p1;
 			p1=((5.0 * z * p2) - (2.0 * z)) / 3;
-			
+
 			p3=p2;
 			p2=p1;
 			p1=((7.0 * z * p2) - (3.0 * p3)) / 4;
-			
+
 			p3=p2;
 			p2=p1;
 			p1=((9.0 * z * p2) - (4.0 * p3)) / 5;
-		    
+
 		    pp=5*(z*p1-p2)/(z*z-1.0);
 		    z1=z;
 		    z=z1-p1/pp;
 	    } while (fabs(z-z1) > 3.0e-11);
-	    
+
 	    x[i]=xm-xl*z;
 	    x[5+1-i]=xm+xl*z;
 	    w[i]=2.0*xl/((1.0-z*z)*pp*pp);
 	    w[5+1-i]=w[i];
     }
-    
+
     for(int j=1; j<=5; j++) s += w[j]*swit2_(x[j]);
-    
+
     return s;
 }
 
@@ -143,28 +144,28 @@ int scanhash_m7m_hash(int thr_id, uint32_t *pdata, const uint32_t *ptarget,
 
     sph_sha256_context       ctx_final_sha256;
 
-    sph_sha256_context       ctx_sha256;
+    blake2b_state            ctx_blake2b;
     sph_sha512_context       ctx_sha512;
     sph_keccak512_context    ctx_keccak;
     sph_whirlpool_context    ctx_whirlpool;
     sph_haval256_5_context   ctx_haval;
     sph_tiger_context        ctx_tiger;
     sph_ripemd160_context    ctx_ripemd;
-    
+
     sph_sha256_init(&ctx_final_sha256);
-    
-    sph_sha256_init(&ctx_sha256);
-    sph_sha256 (&ctx_sha256, data, M7_MIDSTATE_LEN);
-    
+
+    blake2b_init(&ctx_blake2b);
+    blake2b_update (&ctx_blake2b, data, M7_MIDSTATE_LEN);
+
     sph_sha512_init(&ctx_sha512);
     sph_sha512 (&ctx_sha512, data, M7_MIDSTATE_LEN);
-    
+
     sph_keccak512_init(&ctx_keccak);
     sph_keccak512 (&ctx_keccak, data, M7_MIDSTATE_LEN);
 
     sph_whirlpool_init(&ctx_whirlpool);
     sph_whirlpool (&ctx_whirlpool, data, M7_MIDSTATE_LEN);
-    
+
     sph_haval256_5_init(&ctx_haval);
     sph_haval256_5 (&ctx_haval, data, M7_MIDSTATE_LEN);
 
@@ -174,17 +175,17 @@ int scanhash_m7m_hash(int thr_id, uint32_t *pdata, const uint32_t *ptarget,
     sph_ripemd160_init(&ctx_ripemd);
     sph_ripemd160 (&ctx_ripemd, data, M7_MIDSTATE_LEN);
 
-    sph_sha256_context       ctx2_sha256;
+    blake2b_state            ctx2_blake2b;
     sph_sha512_context       ctx2_sha512;
     sph_keccak512_context    ctx2_keccak;
     sph_whirlpool_context    ctx2_whirlpool;
     sph_haval256_5_context   ctx2_haval;
     sph_tiger_context        ctx2_tiger;
     sph_ripemd160_context    ctx2_ripemd;
-	
+
     mpz_t magipi, magisw, product, bns0, bns1;
     mpf_t magifpi, magifpi0, mpt1, mpt2, mptmp, mpten;
-    
+
     mpz_inits(magipi, magisw, bns0, bns1, NULL);
     mpz_init2(product, 512);
 
@@ -204,14 +205,14 @@ int scanhash_m7m_hash(int thr_id, uint32_t *pdata, const uint32_t *ptarget,
         data[19] = ++n;
         memset(bhash, 0, 7 * 64);
 
-        ctx2_sha256 = ctx_sha256;
-        sph_sha256 (&ctx2_sha256, data_p64, 80 - M7_MIDSTATE_LEN);
-        sph_sha256_close(&ctx2_sha256, (void*)(bhash[0]));
+        ctx2_blake2b = ctx_blake2b;
+        blake2b_update (&ctx2_blake2b, data_p64, 80 - M7_MIDSTATE_LEN);
+        blake2b_final(&ctx2_blake2b, (void*)(bhash[0]));
 
         ctx2_sha512 = ctx_sha512;
         sph_sha512 (&ctx2_sha512, data_p64, 80 - M7_MIDSTATE_LEN);
         sph_sha512_close(&ctx2_sha512, (void*)(bhash[1]));
-        
+
         ctx2_keccak = ctx_keccak;
         sph_keccak512 (&ctx2_keccak, data_p64, 80 - M7_MIDSTATE_LEN);
         sph_keccak512_close(&ctx2_keccak, (void*)(bhash[2]));
@@ -219,7 +220,7 @@ int scanhash_m7m_hash(int thr_id, uint32_t *pdata, const uint32_t *ptarget,
         ctx2_whirlpool = ctx_whirlpool;
         sph_whirlpool (&ctx2_whirlpool, data_p64, 80 - M7_MIDSTATE_LEN);
         sph_whirlpool_close(&ctx2_whirlpool, (void*)(bhash[3]));
-        
+
         ctx2_haval = ctx_haval;
         sph_haval256_5 (&ctx2_haval, data_p64, 80 - M7_MIDSTATE_LEN);
         sph_haval256_5_close(&ctx2_haval, (void*)(bhash[4]));
@@ -259,9 +260,9 @@ int scanhash_m7m_hash(int thr_id, uint32_t *pdata, const uint32_t *ptarget,
         usw_ = sw2_(n/2);
 	mpzscale = 1;
         mpz_set_ui(magisw, usw_);
-	    
+
         for(i = 0; i < 5; i++)
-        {	
+        {
             mpf_set_d(mpt1, 0.25*mpzscale);
 	    mpf_sub(mpt1, mpt1, mpt2);
             mpf_abs(mpt1, mpt1);
@@ -271,7 +272,7 @@ int scanhash_m7m_hash(int thr_id, uint32_t *pdata, const uint32_t *ptarget,
 	    mpz_set_f(magipi, magifpi);
             mpz_add(magipi,magipi,magisw);
             mpz_add(product,product,magipi);
-			
+
 	    mpz_import(bns0, b, -1, p, -1, 0, (void*)(hash));
             mpz_add(bns1, bns1, bns0);
             mpz_mul(product,product,bns1);
@@ -280,7 +281,7 @@ int scanhash_m7m_hash(int thr_id, uint32_t *pdata, const uint32_t *ptarget,
             bytes = mpz_sizeinbase(product, 256);
             mpzscale=bytes;
             mpz_export(bdata, NULL, -1, 1, 0, 0, product);
-			
+
             sph_sha256 (&ctx_final_sha256, bdata, bytes);
             sph_sha256_close(&ctx_final_sha256, (void*)(hash));
 	}
@@ -298,7 +299,7 @@ int scanhash_m7m_hash(int thr_id, uint32_t *pdata, const uint32_t *ptarget,
                 bin2hex(hash_str, (unsigned char *)hash, 32);
                 bin2hex(target_str, (unsigned char *)ptarget, 32);
                 bin2hex(data_str, (unsigned char *)data, 80);
-                applog(LOG_DEBUG, "DEBUG: [%d thread] Found share!\ndata   %s\nhash   %s\ntarget %s", thr_id, 
+                applog(LOG_DEBUG, "DEBUG: [%d thread] Found share!\ndata   %s\nhash   %s\ntarget %s", thr_id,
                     data_str,
                     hash_str,
                     target_str);
