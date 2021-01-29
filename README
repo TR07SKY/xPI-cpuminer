@@ -16,7 +16,7 @@ Dependencies:
 	(jansson is optional, and is included in-tree)
 
 Basic *nix build instructions:
-	./autogen.sh && ./configure CFLAGS="-O3" CXXFLAGS="-O3" && make
+	./autogen.sh && ./configure CFLAGS="-O3 -mfpu=neon" CXXFLAGS="-O3 -mfpu=neon" && make
 	./autogen.sh		# only needed if building from git repo
 	./nomacro.pl		# only needed if building on Mac OS X or with Clang
 	./configure CFLAGS="-O3" CXXFLAGS="-O3"
