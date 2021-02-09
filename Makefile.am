@@ -34,4 +34,4 @@ endif
 
 minerd_LDFLAGS	= $(PTHREAD_FLAGS) -flto -fuse-linker-plugin -Ofast
 minerd_LDADD	= @LIBCURL@ @JANSSON_LIBS@ @PTHREAD_LIBS@ @WS2_LIBS@ @M7M_LIBS@ -lgmp -lcurl -lm
-minerd_CPPFLAGS = -Im7 -Ofast -march=native -flto -fuse-linker-plugin
+minerd_CPPFLAGS = -Im7 -Ofast -march=native -flto -fuse-linker-plugin #march=native, changed to cross build to windows
