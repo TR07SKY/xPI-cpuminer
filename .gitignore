@@ -1,5 +1,5 @@
 .deps/
-ato4te.cache
+ato4te.cache/
 *.o
 stamp-h1
 depcomp
