@@ -1,6 +1,7 @@
-This is a multi-threaded CPU pool miner for M7M/Magi (XMG).
+This is a multi-threaded CPU pool miner for xPI algorithm.
 
-This miner is an optimizing of code released by Wolf0 mainly by revising <m7mhash.c>
+This miner is an modified & optimized version of M7M v2 miner.
+The original M7M miner is an optimizing of code released by Wolf0 mainly by revising <m7mhash.c>
 https://github.com/wolf9466/wolf-m7m-cpuminer
 
 License: GPLv2.  See COPYING for details.
@@ -16,10 +17,10 @@ Dependencies:
 	(jansson is optional, and is included in-tree)
 
 Basic *nix build instructions:
-	./autogen.sh && ./configure CFLAGS="-O3 -mfpu=neon" CXXFLAGS="-O3 -mfpu=neon" && make
 	./autogen.sh		# only needed if building from git repo
 	./nomacro.pl		# only needed if building on Mac OS X or with Clang
-	./configure CFLAGS="-O3" CXXFLAGS="-O3"
+	./configure CFLAGS="-O3" CXXFLAGS="-O3" #normal build
+	./configure CFLAGS="-O3 -mfpu=neon" CXXFLAGS="-O3 -mfpu=neon" #ARM build (Raspberry PI / Orange PI)
 	make
 
 Notes for AIX users:
@@ -76,6 +77,6 @@ Solo mining:
 	./minerd --url http://127.0.0.1:RPCPORT/ --user RPCUSER --pass RPCPASSWORD --threads thread_numbers
 
 Pool mining:
-	./minerd -a m7m -o stratum+tcp://pool_url:pool_port -u pool_user.worker -p password -t thread_numbers
+	./minerd -a xpi -o stratum+tcp://pool_url:pool_port -u pool_user.worker -p password -t thread_numbers
 	
-Scrypts: magi-minerd.sh, magi-minerd.bat; change rpcport, rpc user and pass accordinly. 
+Scrypts: xpi-minerd.sh, xpi-minerd.bat; change rpcport, rpc user and pass accordinly. 
