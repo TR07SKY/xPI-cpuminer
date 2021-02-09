@@ -86,7 +86,7 @@ static inline void affine_to_cpu(int id, int cpu)
 {
 }
 #endif
-		
+
 enum workio_commands {
 	WC_GET_WORK,
 	WC_SUBMIT_WORK,
@@ -101,15 +101,13 @@ struct workio_cmd {
 };
 
 enum algos {
-	ALGO_SCRYPT,		/* scrypt(1024,1,1) */
-	ALGO_SHA256D,		/* SHA-256d */
+	//ALGO_SCRYPT,		/* scrypt(1024,1,1) */
+	//ALGO_SHA256D,		/* SHA-256d */
 	ALGO_M7M			/* M7Mhash */
 };
 
 static const char *algo_names[] = {
-	[ALGO_SCRYPT]		= "scrypt",
-	[ALGO_SHA256D]		= "sha256d",
-	[ALGO_M7M]			= "m7mhash",
+	[ALGO_M7M]			= "xpi",
 };
 
 bool opt_debug = false;
@@ -172,9 +170,7 @@ static char const usage[] = "\
 Usage: " PROGRAM_NAME " [OPTIONS]\n\
 Options:\n\
   -a, --algo=ALGO       specify the algorithm to use\n\
-                          scrypt    scrypt(1024, 1, 1) (default)\n\
-                          scrypt:N  scrypt(N, 1, 1)\n\
-                          sha256d   SHA-256d\n\
+                          xpi   xPI\n\
   -o, --url=URL         URL of mining server\n\
   -O, --userpass=U:P    username:password pair for mining server\n\
   -u, --user=USERNAME   username for mining server\n\
@@ -636,7 +632,7 @@ static void share_result(int result, const char *reason)
 		hashrate += thr_hashrates[i];
 	result ? accepted_count++ : rejected_count++;
 	pthread_mutex_unlock(&stats_lock);
-	
+
 	sprintf(s, hashrate >= 1e6 ? "%.0f" : "%.2f", 1e-3 * hashrate);
 	applog(LOG_INFO, "accepted: %lu/%lu (%.2f%%), %s khash/s %s",
 		   accepted_count,
@@ -1007,7 +1003,7 @@ static bool get_work(struct thr_info *thr, struct work *work)
 static bool submit_work(struct thr_info *thr, const struct work *work_in)
 {
 	struct workio_cmd *wc;
-	
+
 	/* fill out work request message */
 	wc = calloc(1, sizeof(*wc));
 	if (!wc)
@@ -1051,7 +1047,7 @@ static void stratum_gen_work(struct stratum_ctx *sctx, struct work *work)
 		memcpy(merkle_root + 32, sctx->job.merkle[i], 32);
 		sha256d(merkle_root, merkle_root, 64);
 	}
-	
+
 	/* Increment extranonce2 */
 	for (i = 0; i < sctx->xnonce2_size && !++sctx->job.xnonce2[i]; i++);
 
@@ -1081,10 +1077,10 @@ static void stratum_gen_work(struct stratum_ctx *sctx, struct work *work)
 		free(xnonce2str);
 	}
 
-	if (opt_algo == ALGO_SCRYPT || opt_algo == ALGO_M7M)
+	if (opt_algo == ALGO_M7M)
 		diff_to_target(work->target, sctx->job.diff / 65536.0);
-	else
-		diff_to_target(work->target, sctx->job.diff);
+	//else
+		//diff_to_target(work->target, sctx->job.diff);
 }
 
 static void *miner_thread(void *userdata)
@@ -1113,15 +1109,6 @@ static void *miner_thread(void *userdata)
 			applog(LOG_INFO, "Binding thread %d to cpu %d",
 			       thr_id, thr_id % num_processors);
 		affine_to_cpu(thr_id, thr_id % num_processors);
-	}
-	
-	if (opt_algo == ALGO_SCRYPT) {
-		scratchbuf = scrypt_buffer_alloc(opt_scrypt_n);
-		if (!scratchbuf) {
-			applog(LOG_ERR, "scrypt buffer allocation failed");
-			pthread_mutex_lock(&applog_lock);
-			exit(1);
-		}
 	}
 
 	while (1) {
@@ -1164,7 +1151,7 @@ static void *miner_thread(void *userdata)
 			work.data[19]++;
 		pthread_mutex_unlock(&g_work_lock);
 		work_restart[thr_id].restart = 0;
-		
+
 		/* adjust max_nonce to meet target scan time */
 		if (have_stratum)
 			max64 = LP_SCANTIME;
@@ -1174,12 +1161,6 @@ static void *miner_thread(void *userdata)
 		max64 *= thr_hashrates[thr_id];
 		if (max64 <= 0) {
 			switch (opt_algo) {
-			case ALGO_SCRYPT:
-				max64 = opt_scrypt_n < 16 ? 0x3ffff : 0x3fffff / opt_scrypt_n;
-				break;
-			case ALGO_SHA256D:
-				max64 = 0x1fffff;
-				break;
 			case ALGO_M7M:
 				max64 = 0x3ffff;
 				break;
@@ -1189,22 +1170,12 @@ static void *miner_thread(void *userdata)
 			max_nonce = end_nonce;
 		else
 			max_nonce = work.data[19] + max64;
-		
+
 		hashes_done = 0;
 		gettimeofday(&tv_start, NULL);
 
 		/* scan nonces for a proof-of-work hash */
 		switch (opt_algo) {
-		case ALGO_SCRYPT:
-			rc = scanhash_scrypt(thr_id, work.data, scratchbuf, work.target,
-			                     max_nonce, &hashes_done, opt_scrypt_n);
-			break;
-
-		case ALGO_SHA256D:
-			rc = scanhash_sha256d(thr_id, work.data, work.target,
-			                      max_nonce, &hashes_done);
-			break;
-
 		case ALGO_M7M:
 			rc = scanhash_m7m_hash(thr_id, work.data, work.target,
 			                      max_nonce, &hashes_done);
@@ -1282,7 +1253,7 @@ start:
 		lp_url = hdr_path;
 		hdr_path = NULL;
 	}
-	
+
 	/* absolute path, on current server */
 	else {
 		copy_start = (*hdr_path == '/') ? (hdr_path + 1) : hdr_path;
@@ -1435,7 +1406,7 @@ static void *stratum_thread(void *userdata)
 				restart_threads();
 			}
 		}
-		
+
 		if (!stratum_socket_full(&stratum, 120)) {
 			applog(LOG_ERR, "Stratum connection timed out");
 			s = NULL;
@@ -1530,15 +1501,6 @@ static void parse_arg(int key, char *arg, char *pname)
 			if (!strncmp(arg, algo_names[i], v)) {
 				if (arg[v] == '\0') {
 					opt_algo = i;
-					break;
-				}
-				if (arg[v] == ':' && i == ALGO_SCRYPT) {
-					char *ep;
-					v = strtol(arg+v+1, &ep, 10);
-					if (*ep || v & (v-1) || v < 2)
-						continue;
-					opt_algo = i;
-					opt_scrypt_n = v;
 					break;
 				}
 			}
@@ -1912,7 +1874,7 @@ int main(int argc, char *argv[])
 	thr_info = calloc(opt_n_threads + 3, sizeof(*thr));
 	if (!thr_info)
 		return 1;
-	
+
 	thr_hashrates = (double *) calloc(opt_n_threads, sizeof(double));
 	if (!thr_hashrates)
 		return 1;

@@ -97,8 +97,8 @@ minerd-m7mhash.o: m7mhash.c /usr/include/stdc-predef.h cpuminer-config.h \
  /usr/include/arm-linux-gnueabihf/bits/mathcalls-helper-functions.h \
  /usr/include/arm-linux-gnueabihf/bits/mathcalls.h \
  /usr/include/arm-linux-gnueabihf/bits/mathinline.h m7/sph_sha2.h \
- m7/sph_types.h m7/sph_keccak.h m7/sph_haval.h m7/poly1305.h \
- m7/sph_whirlpool.h m7/sph_ripemd.h m7/blake2b.h
+ m7/sph_types.h m7/sph_keccak.h m7/sph_haval.h m7/sph_whirlpool.h \
+ m7/sph_ripemd.h m7/blake2b.h m7/poly1305.h
 
 /usr/include/stdc-predef.h:
 
@@ -334,10 +334,10 @@ m7/sph_keccak.h:
 
 m7/sph_haval.h:
 
-m7/poly1305.h:
-
 m7/sph_whirlpool.h:
 
 m7/sph_ripemd.h:
 
 m7/blake2b.h:
+
+m7/poly1305.h:

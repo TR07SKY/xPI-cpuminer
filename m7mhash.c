@@ -10,10 +10,10 @@
 #include <sph_sha2.h>
 #include <sph_keccak.h>
 #include <sph_haval.h>
-#include <poly1305.h>
 #include <sph_whirlpool.h>
 #include <sph_ripemd.h>
 #include "m7/blake2b.h"
+#include "m7/poly1305.h"
 
 #define EPSa DBL_EPSILON
 #define EPS1 DBL_EPSILON
@@ -180,7 +180,7 @@ int scanhash_m7m_hash(int thr_id, uint32_t *pdata, const uint32_t *ptarget,
     sph_keccak512_context    ctx2_keccak;
     sph_whirlpool_context    ctx2_whirlpool;
     sph_haval256_5_context   ctx2_haval;
-    poly1305_context        ctx2_poly1305;
+    poly1305_context         ctx2_poly1305;
     sph_ripemd160_context    ctx2_ripemd;
 
     mpz_t magipi, magisw, product, bns0, bns1;
